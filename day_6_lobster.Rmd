@@ -1,0 +1,155 @@
+---
+title: "allison_day_6"
+author: "Risa Lewis"
+date: "9/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(RColorBrewer)
+library(ggbeeswarm)
+library(stargazer)
+```
+
+### Read in lobster data
+
+```{r}
+lobsters <- read_csv(here("data", "lter_lobster.csv")) %>% 
+  clean_names()
+```
+### Make a copy
+
+```{r}
+lobster_eda <- lobsters
+```
+
+### A couple different visualizations
+
+#### Histograms
+
+```{r}
+lobster_eda <- lobster_eda %>% 
+  uncount(count)
+
+ggplot(data = lobster_eda, aes(x = size)) +
+  geom_histogram() +
+  labs(x = "Lobster carapace length (mm)",
+       y = "Frequency",
+       title = "Lobster size distribution")
+```
+
+
+### Quantile-Quantile plot to explore normality
+
+```{r}
+ggplot(data = lobster_eda, aes(sample = size)) +
+  geom_qq() +
+  facet_wrap(~ site)
+```
+
+#### Boxplot
+
+```{r}
+ggplot(data = lobster_eda, aes(x = site, y = size)) +
+  geom_boxplot(aes(fill = site)) +
+  labs(x = "Study site",
+       y = "Lobster size (mm)",
+       title = "Lobster sizes, SB Coast") +
+  theme_minimal()
+```
+
+
+#### Jitter plot
+
+```{r}
+ggplot(data = lobster_eda, aes(x = site, y = size)) +
+  geom_jitter(width = 0.1, alpha = 0.4, size = 0.7) +
+  geom_boxplot(alpha = 0.2)
+```
+
+
+#### Beeswarm Plot
+
+```{r}
+ggplot(data = lobster_eda, aes(x = site, y = size)) +
+  geom_beeswarm() +
+  geom_violin(aes(fill = site), alpha = 0.5) +
+  facet_wrap(~ site)
+```
+
+#### Summary Stats
+
+```{r, echo = TRUE}
+count_by_site <- lobster_eda %>% 
+  count(site, year)
+
+lobster_summary <- lobster_eda %>% 
+  group_by(site) %>% 
+  summarize(mean_size = mean(size),
+          sd_size = sd(size))
+```
+
+#### Hypothesis Testing
+
+```{r}
+sample_1 <- c(2,5,4,3,5,6,7,7,9)
+sample_2 <- c(10,9,6,12,18,11,5,2,14)
+
+example_ttest <- t.test(sample_1, sample_2)
+example_ttest
+```
+
+### How to make your own data frame
+
+```{r}
+
+df <- dplyr::tribble(
+  ~teddy, ~allison, ~greg,
+  1, 2, 3,
+  10, 12, 15
+  )
+```
+
+### Linear Regression
+
+Using the 'trees' built-in dataset.
+
+```{r}
+ggplot(data = trees, aes(x = Girth, y = Volume)) +
+  geom_point() +
+  geom_smooth(method = "la")
+```
+
+#### Model Linear Relationship
+
+```{r}
+tree_lm <- lm(Volume ~ Girth, data = trees)
+
+tree_lm
+
+summary(tree_lm)
+
+plot(tree_lm)
+```
+
+My formula is $y = mx + b$
+
+#### Multiple linear regression
+
+```{r}
+tree_mlr <- lm(Volume ~ Height + Girth, data = trees)
+
+tree_mlr
+
+plot(tree_mlr)
+```
+### Summary Output Table
+
+```{r, results = "asis"}
+stargazer(tree_mlr, type = "html")
+```
+
