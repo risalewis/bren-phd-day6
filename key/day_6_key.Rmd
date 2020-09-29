@@ -32,7 +32,6 @@ library(broom)
 - Markdown continued
 - Basic data exploration graphs (hist, qqnorm)
 - Data wrangling continued + group_by
-- Graphs with error bars
 - Explicitly ordering categorical variables
 - ggplot finalization 
 - Creating some data from scratch
@@ -79,7 +78,7 @@ ggplot(lobster_eda, aes(sample = size)) +
 ggplot(lobster_eda, aes(x = site, y = size)) +
   geom_boxplot()
 
-# Jitterplots are TOTALLY unbiased because they show EVERYTHING
+# Jitterplots are unbiased because they show EVERYTHING
 ggplot(lobster_eda, aes(x = site, y = size, color = site)) +
   geom_jitter(width = 0.1, alpha = 0.4, size = 0.8)
 
